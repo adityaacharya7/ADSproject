@@ -1,0 +1,13 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+.git/
+.gitignore
+.streamlit/secrets.toml
+.DS_Store
+Thumbs.db

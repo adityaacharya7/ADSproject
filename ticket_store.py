@@ -59,6 +59,8 @@ class TicketStore:
         database_url = database_url or os.getenv("DATABASE_URL", "sqlite:///support_tickets.db")
         if database_url.startswith("postgres://"):
             database_url = "postgresql+psycopg://" + database_url.removeprefix("postgres://")
+        elif database_url.startswith("postgresql://") and not database_url.startswith("postgresql+"):
+            database_url = "postgresql+psycopg://" + database_url.removeprefix("postgresql://")
         kwargs = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
         self.engine = create_engine(database_url, connect_args=kwargs, pool_pre_ping=True)
         self.Session = sessionmaker(self.engine, expire_on_commit=False)
