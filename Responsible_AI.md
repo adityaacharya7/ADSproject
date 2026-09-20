@@ -111,7 +111,7 @@ Customer support interactions frequently contain sensitive Personally Identifiab
 | **Fairness** | Demographic Parity Difference $< 0.10$ | ✔ PASS | Fairlearn benchmark audit (0.048) |
 | **Fairness** | Equalized Odds Difference $< 0.10$ | ✔ PASS | Threshold post-processing (0.056) |
 | **Privacy** | Sensitive PII scrubbed prior to inference | ✔ PASS | Automated regex sanitizer |
-| **Privacy** | GDPR Right to be Forgotten compliance | ✔ PASS | No persistent storage of raw queries |
+| **Consent & Privacy** | GDPR Right to be Forgotten & explicit consent for retraining | ✔ PASS | Zero persistent retention of raw queries without opt-in consent |
 | **Explainability** | Token-level feature attribution available | ✔ PASS | SHAP / Leave-one-out XAI engine |
 | **Transparency** | Model architecture & limitations disclosed | ✔ PASS | Model Card in README.md |
 | **Safety** | Ephemeral container sandboxing | ✔ PASS | Non-root Docker container (appuser) |

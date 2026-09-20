@@ -253,6 +253,26 @@ with queue_tab:
             else:
                 st.info(f"SLA: {sla_text} · Due {display_time(ticket['sla_due_at'])}")
             st.write("**Recommended handling:**", ticket["routing_recommendation"])
+            with st.expander("🔍 Explain prediction (SHAP feature attribution)", expanded=False):
+                attributions = service.engine.explain_prediction(ticket["message"])
+                if attributions:
+                    df_attr = pd.DataFrame(attributions[:8])
+                    fig_shap = px.bar(
+                        df_attr,
+                        x="attribution",
+                        y="token",
+                        orientation="h",
+                        color="direction",
+                        color_discrete_map={"Positive": "#10b981", "Negative": "#ef4444"},
+                        labels={"attribution": f"SHAP Impact on {ticket['primary_emotion']}", "token": "Token"},
+                        title=f"Token Attribution (SHAP Feature Importance for {ticket['primary_emotion']})"
+                    )
+                    fig_shap.update_layout(margin=dict(l=10, r=10, t=40, b=10), showlegend=False,
+                                           yaxis={'categoryorder': 'total ascending'}, height=280)
+                    st.plotly_chart(fig_shap, width="stretch")
+                    st.caption("Green bars show words driving the model toward this emotion; red bars push away.")
+                else:
+                    st.caption("No token attributions available for this message.")
             with st.expander("View audit history"):
                 history = pd.DataFrame(service.store.events(ticket["id"]))
                 st.dataframe(history, width="stretch", hide_index=True)
@@ -322,6 +342,23 @@ with intake_tab:
             st.metric("Confidence", f"{created['confidence']:.0%}")
             st.info(f"Respond by {display_time(created['sla_due_at'])}")
             st.write(created["routing_recommendation"])
+            with st.expander("🔍 SHAP Feature Attribution", expanded=True):
+                attributions = service.engine.explain_prediction(created["message"])
+                if attributions:
+                    df_attr = pd.DataFrame(attributions[:6])
+                    fig_shap = px.bar(
+                        df_attr,
+                        x="attribution",
+                        y="token",
+                        orientation="h",
+                        color="direction",
+                        color_discrete_map={"Positive": "#10b981", "Negative": "#ef4444"},
+                        labels={"attribution": "SHAP Impact", "token": "Word"},
+                        title=f"Key Tokens Driving {created['primary_emotion']}"
+                    )
+                    fig_shap.update_layout(margin=dict(l=10, r=10, t=35, b=10), showlegend=False,
+                                           yaxis={'categoryorder': 'total ascending'}, height=240)
+                    st.plotly_chart(fig_shap, width="stretch")
         else:
             st.info("Submit a message to see its emotion, confidence, priority, and SLA here.")
 
