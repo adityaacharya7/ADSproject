@@ -176,8 +176,13 @@ with home_tab:
             st.markdown('<div class="step"><strong>4 · Resolve</strong><br>Actions are audited and operations metrics update automatically.</div>', unsafe_allow_html=True)
 
 with queue_tab:
-    st.subheader("Ticket queue")
-    st.caption("Tickets are ordered by the closest SLA deadline. Use filters to focus your work.")
+    q_col1, q_col2 = st.columns([3.5, 1])
+    with q_col1:
+        st.subheader("Ticket queue")
+        st.caption("Tickets are ordered by the closest SLA deadline. Use filters to focus your work.")
+    with q_col2:
+        if st.button("🔄 Refresh queue", width="stretch", help="Reload the latest tickets from the database"):
+            st.rerun()
     with st.container(border=True):
         f1, f2, f3, f4 = st.columns([1.1, 1, 1, 1.2])
         with f1:
@@ -302,9 +307,12 @@ with intake_tab:
             try:
                 created = service.create_ticket(message, external_id, "manual", st.session_state.agent_name)
                 st.session_state.last_created_ticket = created
-                st.success("Ticket added to the queue.")
+                st.session_state.ticket_just_added = True
+                st.rerun()
             except ValueError as exc:
                 st.error(str(exc))
+        if st.session_state.pop("ticket_just_added", False):
+            st.success("Ticket added to the queue.")
     with right:
         st.subheader("Triage result")
         created = st.session_state.get("last_created_ticket")
@@ -362,6 +370,7 @@ with batch_tab:
                             errors.append({"CSV row": position + 1, "Problem": str(exc)})
                         progress.progress(position / len(import_rows), text=f"Analyzed {position} of {len(import_rows)}")
                     st.success(f"Import complete: {created_count} added, {duplicate_count} duplicates skipped, {len(errors)} failed.")
+                    st.button("🔄 View imported tickets in queue", on_click=st.rerun)
                     if errors:
                         st.dataframe(pd.DataFrame(errors), width="stretch", hide_index=True)
         except Exception as exc:
