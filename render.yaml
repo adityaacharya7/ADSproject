@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: supportflow-ai
+    runtime: docker
+    plan: free
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PORT
+        value: 8501
