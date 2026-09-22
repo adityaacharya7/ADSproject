@@ -77,8 +77,8 @@ curl -X POST http://localhost:8000/predict \
 
 For production, provision PostgreSQL and set `DATABASE_URL` on both services. Deploy the repository twice:
 
-1. Dashboard service: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0`
-2. API service: `uvicorn api:app --host 0.0.0.0 --port=$PORT`
+1. Dashboard service: `sh -c 'streamlit run app.py --server.port=${PORT:-8501} --server.address=0.0.0.0'`
+2. API service: `sh -c 'uvicorn api:app --host 0.0.0.0 --port=${PORT:-8000}'`
 
 Set the same `DATABASE_URL` for both. Set `APP_PASSWORD` on the dashboard and `API_KEY` on the API. The included `railway.json` starts the dashboard by default; override the start command for the API service.
 

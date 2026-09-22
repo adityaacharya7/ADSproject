@@ -4,7 +4,7 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0",
+    "startCommand": "sh -c 'streamlit run app.py --server.port=${PORT:-8501} --server.address=0.0.0.0'",
     "healthcheckPath": "/_stcore/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
