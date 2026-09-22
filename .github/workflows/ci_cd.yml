@@ -82,22 +82,20 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install Core Inference Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install lightgbm scikit-learn joblib vaderSentiment
+          pip install -r requirements.txt
 
       - name: Verify Model Weights and Deserialization Integrity
         run: |
           python -c "
-          import os, joblib
-          model_path = 'models/best_emotion_model.joblib'
-          assert os.path.exists(model_path), f'Missing model artifact: {model_path}'
-          size_mb = os.path.getsize(model_path) / (1024 * 1024)
-          print(f'[+] Model artifact verified: {model_path} ({size_mb:.2f} MB)')
-          data = joblib.load(model_path)
-          assert hasattr(data, 'predict') or 'model' in data or 'pipeline' in data, 'Invalid model structure'
-          print('[+] Model deserialization check passed successfully.')
+          from model_engine import EmotionEngine
+          engine = EmotionEngine()
+          assert engine.pipeline is not None
+          res = engine.predict('I am very satisfied with this quick response!')
+          assert res['primary_emotion'] in ('Joy / Gratitude', 'Neutral / Inquiry', 'Anger / Frustration', 'Disappointment / Sadness', 'Fear / Anxiety')
+          print(f'[+] Production model verified: predicted {res[\"primary_emotion\"]}')
           "
 
   # ----------------------------------------------------------------------------
